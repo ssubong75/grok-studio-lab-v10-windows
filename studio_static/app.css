@@ -2800,7 +2800,7 @@ h1 {
   left: calc(276px + (100vw - 276px) / 2);
   z-index: 40;
   bottom: 20px;
-  width: min(920px, calc(100vw - 276px - 48px));
+  width: min(980px, calc(100vw - 276px - 48px));
   margin: 0;
   padding: 10px;
   border-color: rgb(255 255 255 / 0.08);
@@ -2812,7 +2812,7 @@ h1 {
 
 .app-shell.sidebar-collapsed .lab-composer {
   left: calc(76px + (100vw - 76px) / 2);
-  width: min(920px, calc(100vw - 76px - 48px));
+  width: min(980px, calc(100vw - 76px - 48px));
 }
 
 .composer-plus-row {
