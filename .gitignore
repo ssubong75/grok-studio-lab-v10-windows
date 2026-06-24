@@ -1,0 +1,11 @@
+.DS_Store
+__pycache__/
+*.pyc
+*.pyo
+*.log
+*.zip
+.cache/
+cache/
+grok_studio_data/
+grok_studio_data_v2/
+grok_studio_data_v6/

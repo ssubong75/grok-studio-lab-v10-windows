@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Grok Studio Lab</title>
+    <link rel="stylesheet" href="/assets/app.css?v=lab-v10-media-icons-soft-20260624-01" />
+  </head>
+  <body>
+    <button id="sidebarOpenBtn" class="sidebar-open" data-symbol="&gt;&gt;" hidden aria-label="Open sidebar">&gt;&gt;</button>
+    <div class="app-shell" id="appShell">
+      <aside class="sidebar">
+        <div class="sidebar-head">
+          <div class="brand">
+            <button id="brandHomeBtn" class="brand-home-button" type="button" aria-label="Go to Home">
+              <img class="brand-icon" src="/assets/GrokStudioProIcon.png" alt="Grok Studio Lab" />
+              <img class="brand-icon brand-icon-accent" src="/assets/GrokStudioProIconAccent.png" alt="" />
+            </button>
+          </div>
+          <button id="sidebarCloseBtn" class="ghost-button sidebar-close" data-symbol="&lt;&lt;" aria-label="Hide sidebar">&lt;&lt;</button>
+        </div>
+
+        <nav class="nav-stack" aria-label="Library filters">
+          <button class="nav-item active" data-filter="all"><img src="/assets/icons/imagine/home.svg" alt="" /><span>Home</span></button>
+          <button class="nav-item" data-filter="video"><img src="/assets/icons/imagine/video.svg" alt="" /><span>Video</span></button>
+          <button class="nav-item" data-filter="image"><img src="/assets/icons/imagine/image.svg" alt="" /><span>Image</span></button>
+          <button class="nav-item" data-filter="prompt"><span class="nav-icon">T</span><span>Prompt</span></button>
+          <button id="imagineNavBtn" class="nav-item imagine-nav-item" data-view="imagine-library"><img src="/assets/icons/imagine/grok-white.svg" alt="" /><span>Imagine</span></button>
+          <button id="galleryNavBtn" class="nav-item gallery-nav-item" data-view="folder-gallery"><img src="/assets/icons/imagine/gallery.svg" alt="" /><span>Gallery</span></button>
+          <div class="sidebar-block">
+            <label for="searchInput" class="nav-item sidebar-search-label"><img src="/assets/icons/imagine/search.svg" alt="" /><span>Search</span></label>
+            <input id="searchInput" type="search" placeholder="Prompt, title, etc . . ." />
+          </div>
+        </nav>
+
+        <section class="account-card" aria-label="Account">
+          <div class="sidebar-library-actions">
+            <button id="libraryFolderBtn" class="nav-item open-folder-button" type="button">
+              <img src="/assets/icons/imagine/folder-open.svg" alt="" />
+              <span>Open Folder</span>
+            </button>
+            <button id="setLibraryPathBtn" class="nav-item set-library-path-button" type="button">
+              <img src="/assets/icons/imagine/map-pin.svg" alt="" />
+              <span>Set Library Path</span>
+            </button>
+          </div>
+          <button id="usagePageBtn" class="usage-page-button" type="button">
+            <img src="/assets/icons/imagine/usage.svg" alt="" />
+            <span>Usage Page</span>
+          </button>
+          <button id="accountButton" class="account-button" type="button">
+            <span id="accountAvatar" class="account-avatar" aria-hidden="true">B</span>
+            <span class="account-copy">
+              <strong id="accountEmail">Account</strong>
+            </span>
+          </button>
+        </section>
+
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div class="topbar-copy">
+            <h1><button id="titleHomeBtn" class="title-home-button" type="button">Grok Studio Lab</button></h1>
+            <p>Generate, edit, and extend images and videos with Grok.</p>
+          </div>
+        </header>
+
+        <div id="selectionBar" class="selection-bar" hidden>
+          <strong id="selectionCount">Selected: 0</strong>
+          <button id="selectionDownloadBtn" class="ghost-button" type="button">Download</button>
+          <button id="selectionDeleteBtn" class="ghost-button danger-button" type="button">Delete</button>
+          <button id="selectionClearBtn" class="ghost-button" type="button" aria-label="Clear selection">x</button>
+        </div>
+
+        <section id="detailScreen" class="detail-screen" hidden aria-label="Media detail"></section>
+
+        <section id="folderGalleryScreen" class="folder-gallery-screen" hidden aria-label="Gallery folders">
+          <header class="folder-gallery-header">
+            <h2>Gallery</h2>
+            <div class="folder-gallery-actions">
+              <button id="makeFolderBtn" class="make-folder-button" type="button">
+                <span aria-hidden="true">+</span>
+                Make
+              </button>
+              <button id="renameFolderBtn" class="rename-folder-button" type="button">
+                <span aria-hidden="true">=</span>
+                Rename
+              </button>
+              <button id="deleteFolderBtn" class="delete-folder-button" type="button">
+                <span aria-hidden="true">-</span>
+                Delete
+              </button>
+            </div>
+          </header>
+          <div class="folder-gallery-layout">
+            <section class="primary-folder-panel" aria-label="Primary folders">
+              <div class="folder-panel-heading">
+                <button id="collectionHeadingBtn" class="collection-heading-button" type="button" aria-pressed="false">Collection</button>
+              </div>
+              <div id="primaryFolderList" class="primary-folder-list"></div>
+            </section>
+            <section class="secondary-folder-panel" aria-label="Secondary folders">
+              <div class="folder-panel-heading">
+                <div class="gallery-sort-buttons" aria-label="Sort second-level folders">
+                  <button type="button" data-gallery-sort="ko">가나다</button>
+                  <button type="button" data-gallery-sort="abc">ABC</button>
+                  <button id="saveGallerySortBtn" class="save-gallery-sort-button" type="button">Save</button>
+                </div>
+                <strong id="secondaryFolderTitle"></strong>
+              </div>
+              <div id="secondaryFolderGrid" class="secondary-folder-grid"></div>
+            </section>
+          </div>
+        </section>
+
+        <section id="imagineLibraryScreen" class="imagine-library-screen" hidden aria-label="Imagine library">
+          <header class="imagine-library-header">
+            <div class="imagine-title-actions" aria-label="Imagine view filters">
+              <h2>Imagine</h2>
+              <button id="imagineAllViewBtn" class="make-folder-button imagine-view-button imagine-all-view-button" type="button">Portfolio</button>
+              <button id="imagineDiscoverViewBtn" class="make-folder-button imagine-view-button imagine-discover-view-button" type="button">Discover</button>
+              <button id="imagineAllFilesViewBtn" class="make-folder-button imagine-view-button imagine-all-files-view-button" type="button">All Files</button>
+            </div>
+            <div class="imagine-right-actions">
+              <div id="imagineMediaTypeFilters" class="imagine-media-type-filters" aria-label="Imagine media filters">
+                <button class="imagine-media-type-button" type="button" data-imagine-media-type="video" aria-label="Video" title="Video" aria-pressed="false"><img src="/assets/icons/imagine/video.svg" alt="" /></button>
+                <button class="imagine-media-type-button" type="button" data-imagine-media-type="image" aria-label="Image" title="Image" aria-pressed="false"><img src="/assets/icons/imagine/image.svg" alt="" /></button>
+              </div>
+              <button id="imagineImportBtn" class="make-folder-button imagine-import-button" type="button">Selected Import</button>
+            </div>
+          </header>
+          <section id="imagineGallery" class="gallery media-gallery imagine-gallery gallery-empty" aria-live="polite">
+            <div class="empty-state">No Imagine item yet.</div>
+          </section>
+        </section>
+
+        <section class="composer lab-composer" aria-label="Create media">
+          <div id="attachmentTray" class="attachment-tray" hidden>
+            <label class="attachment-upload-card" id="imageSourceDrop">
+              <input id="imageFiles" type="file" accept="image/*" multiple />
+              <img src="/assets/icons/imagine/upload-plus.svg" alt="" />
+              <span><strong>Image</strong><small>Upload or Drop</small></span>
+            </label>
+            <div id="uploadHistoryStrip" class="upload-history-strip"></div>
+            <div id="imageFileNames" class="file-list source-image-list composer-attached-list"></div>
+          </div>
+
+          <div class="composer-plus-row">
+            <button id="composerAttachBtn" class="composer-plus" type="button" aria-label="Attach media">+</button>
+            <textarea id="promptInput" rows="1" wrap="off" placeholder="Describe the scene, motion, edit, or continuation..."></textarea>
+            <button id="submitBtn" class="composer-send" type="button" aria-label="Generate">↑</button>
+          </div>
+
+          <div class="composer-options-row">
+            <div class="composer-mode-controls">
+              <div class="tabs" role="tablist" aria-label="Mode">
+                <button class="tab active" data-mode="image" role="tab"><img src="/assets/icons/imagine/image.svg" alt="" />Image</button>
+                <button class="tab" data-mode="video" role="tab"><img src="/assets/icons/imagine/video.svg" alt="" />Video</button>
+                <button class="tab" data-mode="extend" role="tab"><span class="tab-icon" aria-hidden="true">↻</span>Extend</button>
+                <button class="tab" data-mode="analyze" role="tab"><img src="/assets/icons/imagine/search.svg" alt="" />Analyze</button>
+              </div>
+              <div class="controls-grid">
+                <label id="durationControl">
+                  <span class="control-name">Duration</span>
+                  <select id="durationInput"></select>
+                </label>
+                <label id="trimQualityControl">
+                  <span class="control-name">Quality</span>
+                  <select id="trimQualityInput">
+                    <option value="high" selected>High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                  </select>
+                </label>
+                <label id="ratioControl">
+                  <span class="control-name">Aspect</span>
+                  <select id="aspectInput">
+                    <option value="">Auto</option>
+                    <option>1:1</option>
+                    <option>16:9</option>
+                    <option>9:16</option>
+                    <option>3:2</option>
+                    <option>2:3</option>
+                    <option>4:3</option>
+                    <option>3:4</option>
+                  </select>
+                </label>
+                <label id="imageModelControl">
+                  <span class="control-name">Mode</span>
+                  <select id="imageModelInput">
+                    <option value="grok-imagine-image" selected>Speed</option>
+                    <option value="grok-imagine-image-quality">Quality</option>
+                  </select>
+                </label>
+                <label id="resolutionControl">
+                  <span class="control-name">Resolution</span>
+                  <select id="resolutionInput"></select>
+                </label>
+                <label id="countControl">
+                  <span class="control-name">Count</span>
+                  <select id="countInput">
+                    <option value="1" selected>1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                  </select>
+                </label>
+                <label id="modelControl">
+                  <span class="control-name">Model</span>
+                  <select id="videoModelInput">
+                    <option value="grok-imagine-video-1.5" selected>Model 1.5</option>
+                    <option value="grok-imagine-video-1.5-preview">Model 1.5p</option>
+                    <option value="">Model 1.0</option>
+                  </select>
+                </label>
+                <label id="analyzeModelControl">
+                  <span class="control-name">Model</span>
+                  <select id="analyzeModelInput">
+                    <option value="grok-4.3" selected>Grok 4.3</option>
+                    <option value="grok-4.20-0309-non-reasoning">Grok 4.2</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+            <button id="savePromptBtn" class="save-prompt-lab" type="button">
+              <span class="save-prompt-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1zm1 2v12.6l5-2.9 5 2.9V5H7z"/></svg>
+              </span>
+              Save Prompt
+            </button>
+          </div>
+
+          <input id="categoryInput" type="hidden" value="Inbox" />
+          <input id="tagsInput" type="hidden" value="" />
+
+          <div class="mode-panel active" data-panel="image">
+          </div>
+
+          <div class="mode-panel compact-hidden" data-panel="video">
+            <div class="upload-line two">
+              <div class="video-upload-column">
+                <label class="file-drop" id="startImageDrop">
+                  <input id="startImageFile" type="file" accept="image/*" />
+                  <span>Start image</span>
+                  <small>Image to Video</small>
+                </label>
+                <div id="startImagePreview" class="start-preview" hidden></div>
+              </div>
+              <div class="video-upload-column">
+                <label class="file-drop" id="referenceImageDrop">
+                  <input id="referenceImageFiles" type="file" accept="image/*" multiple />
+                  <span>Reference Image</span>
+                  <small>Up to 7</small>
+                </label>
+                <div id="videoFileNames" class="file-list reference-image-list"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mode-panel compact-hidden" data-panel="extend">
+            <div class="extend-source-grid">
+              <div class="extend-source-block">
+                <input id="sourceVideoSelect" type="hidden" value="" />
+                <div id="sourceVideoDrop" class="file-drop source-video-drop" role="button" tabindex="0">
+                  <span>Library Video</span>
+                  <small>Drag the Library Video</small>
+                </div>
+              </div>
+              <label class="file-drop flat source-upload-drop">
+                <input id="sourceVideoFile" type="file" accept="video/mp4,video/*" />
+                <span>Upload MP4</span>
+                <small>from your Computer</small>
+              </label>
+            </div>
+            <div id="sourceVideoPreview" class="source-video-preview" hidden></div>
+          </div>
+        </section>
+
+        <section class="library-panel" aria-label="Library">
+          <div class="library-header">
+            <div class="library-title-row">
+              <h2><span id="openFolderTitle" class="library-title-button">Home</span></h2>
+              <div id="workspaceMediaTypeFilters" class="workspace-media-type-filters" aria-label="Gallery media filters" hidden>
+                <button class="imagine-media-type-button workspace-media-type-button" type="button" data-workspace-media-filter="video" aria-label="Video" title="Video" aria-pressed="false"><img src="/assets/icons/imagine/video.svg" alt="" /></button>
+                <button class="imagine-media-type-button workspace-media-type-button" type="button" data-workspace-media-filter="image" aria-label="Image" title="Image" aria-pressed="false"><img src="/assets/icons/imagine/image.svg" alt="" /></button>
+              </div>
+              <button id="promptNewBtn" class="prompt-new-button" type="button" hidden><span aria-hidden="true">+</span> Write</button>
+              <p id="libraryCount">0 items</p>
+            </div>
+            <p id="workspaceContext" class="workspace-context" hidden></p>
+            <div class="library-actions">
+              <button id="refreshBtn" class="ghost-button">Refresh</button>
+              <button id="downloadSelectedBtn" class="ghost-button">Download</button>
+              <button id="moveToGalleryBtn" class="ghost-button move-to-gallery-button" type="button" hidden>Move to Gallery</button>
+              <button id="deleteSelectedBtn" class="ghost-button danger-button">Delete</button>
+              <button id="librarySelectionClearBtn" class="ghost-button library-selection-clear" type="button" aria-label="Clear selection" hidden>x</button>
+            </div>
+          </div>
+
+          <section id="gallery" class="gallery" aria-live="polite"></section>
+        </section>
+
+        <div id="accountOverlay" class="account-overlay" hidden>
+          <section id="accountScreen" class="account-screen" aria-label="Account">
+            <div class="account-screen-head">
+              <h2>Account</h2>
+            </div>
+            <div class="account-connect-panel">
+              <section class="account-connect-card" aria-label="Build account">
+                <h3>Build</h3>
+                <div class="account-connect-controls">
+                  <input id="accountNameInput" type="text" placeholder="EMAIL" />
+                  <button id="registerAccountBtn" class="primary-button" type="button">Register</button>
+                </div>
+                <input id="accountPathInput" type="hidden" />
+              </section>
+              <section class="account-connect-card" aria-label="Imagine account">
+                <h3>Imagine</h3>
+                <div class="account-connect-controls imagine-account-actions">
+                  <button id="imagineLoginBtn" class="ghost-button" type="button">Login</button>
+                  <button id="imagineLogoutBtn" class="ghost-button" type="button">Logout</button>
+                  <button id="imagineCaptureBtn" class="primary-button" type="button">Register</button>
+                </div>
+              </section>
+            </div>
+            <div class="account-selection-panel">
+              <div id="accountList" class="account-list"></div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <div id="toast" class="toast" hidden></div>
+    <div id="errorPanel" class="error-panel" hidden>
+      <div class="error-panel-head">
+        <div>
+          <strong id="errorTitle">Job failed</strong>
+          <span id="errorKind">Error</span>
+        </div>
+        <button id="closeErrorBtn" class="ghost-button" type="button">Close</button>
+      </div>
+      <pre id="errorBody"></pre>
+      <div class="error-panel-actions">
+        <button id="copyErrorBtn" class="ghost-button" type="button">Copy</button>
+      </div>
+    </div>
+    <div id="studioFullscreenPlayer" class="video-player studio-fullscreen-player" data-video-player tabindex="0" hidden>
+      <video class="custom-video" playsinline preload="metadata"></video>
+      <div class="video-controls" data-video-controls>
+        <button class="video-play" type="button" aria-label="Play"><span class="video-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span></button>
+        <span class="video-time"><span data-current>0:00</span><span data-time-separator> / </span><span data-duration>0:00</span></span>
+        <input class="video-seek" data-seek type="range" min="0" max="1000" value="0" step="1" aria-label="Seek" />
+        <button class="video-mute" type="button" aria-label="Mute"><span class="video-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L9.8 7.6 18.2 16 20 14.2 5.8 0 4 1.8l5.2 5.2L8 9H4z"/></svg></span></button>
+        <label class="video-volume">
+          <span data-volume-label>100</span>
+          <input class="video-volume-slider" data-volume type="range" min="0" max="100" value="100" step="1" aria-label="Volume" />
+        </label>
+        <button class="video-a" type="button">A</button>
+        <button class="video-b" type="button">B</button>
+        <select class="video-rate" aria-label="Playback speed">
+          <option value="2">2x</option>
+          <option value="1.5">1.5x</option>
+          <option value="1.25">1.25x</option>
+          <option value="1" selected>1x</option>
+          <option value="0.75">0.75x</option>
+          <option value="0.5">0.5x</option>
+          <option value="0.25">0.25x</option>
+        </select>
+      </div>
+    </div>
+    <script src="/assets/app.js?v=lab-v10-media-icons-soft-20260624-01"></script>
+  </body>
+</html>
