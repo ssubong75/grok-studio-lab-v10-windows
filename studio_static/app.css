@@ -3133,11 +3133,11 @@ h1 {
 }
 
 .upload-history-strip {
-  grid-template-columns: repeat(6, minmax(0, 84px));
+  grid-template-columns: repeat(8, minmax(0, 84px));
   grid-auto-rows: 84px;
   justify-content: start;
   min-width: 0;
-  max-height: calc(84px * 3 + 8px * 2);
+  max-height: calc(84px * 2 + 8px);
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
