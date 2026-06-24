@@ -1,6 +1,6 @@
 Grok Studio Lab - Windows 포터블 버전
 =====================================
-V10 Windows portable release
+V10_a Windows portable release
 
 실행 방법
 ---------

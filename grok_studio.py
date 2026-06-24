@@ -11672,7 +11672,6 @@ def move_file_to_windows_recycle_bin(path: Path) -> None:
             ("lpszProgressTitle", wintypes.LPCWSTR),
         ]
 
-    shell32 = ctypes.windll.shell32
     source = str(path) + "\0\0"
     operation = SHFILEOPSTRUCTW(
         None,
@@ -11684,7 +11683,7 @@ def move_file_to_windows_recycle_bin(path: Path) -> None:
         None,
         None,
     )
-    result = shell32.SHFileOperationW(ctypes.byref(operation))
+    result = ctypes.windll.shell32.SHFileOperationW(ctypes.byref(operation))
     if result:
         raise StudioError(f"Could not move to Recycle Bin: Windows shell error {result}", 500)
     if operation.fAnyOperationsAborted:

@@ -24,6 +24,7 @@ const IMAGINE_ALL_FILES_TYPE_ALL = IMAGINE_MEDIA_TYPE_ALL;
 const IMAGINE_ALL_FILES_TYPE_VIDEO = IMAGINE_MEDIA_TYPE_VIDEO;
 const IMAGINE_ALL_FILES_TYPE_IMAGE = IMAGINE_MEDIA_TYPE_IMAGE;
 const IMAGINE_ALL_FILES_TYPE_FILL_MAX_PAGES = 6;
+const UPLOAD_HISTORY_PAGE_SIZE = 18;
 const ACCOUNT_TIERS = ["free", "super", "heavy"];
 const ACCOUNT_TIER_LABELS = {
   free: "Free",
@@ -73,6 +74,7 @@ const state = {
   startImage: null,
   sourceVideo: null,
   attachmentTrayOpen: false,
+  uploadHistoryVisibleCount: UPLOAD_HISTORY_PAGE_SIZE,
   previewOverlay: null,
   promptEditorOverlay: null,
   libraryFolderOverlay: null,
@@ -6598,6 +6600,7 @@ function renderVideoFileNames() {
 
 function toggleAttachmentTray(force) {
   const next = typeof force === "boolean" ? force : !state.attachmentTrayOpen;
+  if (next && !state.attachmentTrayOpen) state.uploadHistoryVisibleCount = UPLOAD_HISTORY_PAGE_SIZE;
   state.attachmentTrayOpen = next;
   renderAttachmentTray();
 }
@@ -6615,31 +6618,43 @@ function renderAttachmentTray() {
 function closeComposerTransientPanels() {
   closeCustomSelects();
   state.attachmentTrayOpen = false;
+  state.uploadHistoryVisibleCount = UPLOAD_HISTORY_PAGE_SIZE;
   renderAttachmentTray();
   setPromptExpanded(false);
 }
 
-function renderUploadHistoryStrip() {
+function renderUploadHistoryStrip(options = {}) {
   if (!els.uploadHistoryStrip) return;
   const uploads = Array.isArray(state.uploads) ? state.uploads : [];
   if (!uploads.length) {
+    els.uploadHistoryStrip.onscroll = null;
+    els.uploadHistoryStrip.onwheel = null;
     els.uploadHistoryStrip.innerHTML = `<p class="upload-history-empty">No uploaded images yet.</p>`;
     return;
   }
+  const visibleCount = Math.min(
+    uploads.length,
+    Math.max(UPLOAD_HISTORY_PAGE_SIZE, Number(state.uploadHistoryVisibleCount || UPLOAD_HISTORY_PAGE_SIZE)),
+  );
+  state.uploadHistoryVisibleCount = visibleCount;
+  const visibleUploads = uploads.slice(0, visibleCount);
   const currentModeSources = state.mode === "image" || state.mode === "analyze"
     ? state.editImages
     : state.mode === "video"
     ? [...(state.startImage ? [state.startImage] : []), ...state.referenceImages]
     : [];
   const attachedUrls = new Set(currentModeSources.map((source) => source.previewUrl).filter(Boolean));
-  els.uploadHistoryStrip.innerHTML = uploads.map((upload, index) => `
+  els.uploadHistoryStrip.innerHTML = visibleUploads.map((upload, index) => `
     <div class="upload-history-thumb-wrap${attachedUrls.has(upload.local_url) ? " active" : ""}">
       <button class="upload-history-thumb" type="button" data-upload-index="${index}">
-        <img src="${escapeHtml(upload.local_url)}" alt="${escapeHtml(upload.name || upload.title || "Uploaded image")}" />
+        <img src="${escapeHtml(upload.local_url)}" alt="${escapeHtml(upload.name || upload.title || "Uploaded image")}" loading="lazy" decoding="async" />
         ${attachedUrls.has(upload.local_url) ? `<span class="upload-selected-check">✓</span>` : ""}
       </button>
     </div>
   `).join("");
+  if (typeof options.restoreScrollTop === "number") {
+    els.uploadHistoryStrip.scrollTop = options.restoreScrollTop;
+  }
   els.uploadHistoryStrip.querySelectorAll(".upload-history-thumb").forEach((button) => {
     button.addEventListener("click", (event) => {
       event.preventDefault();
@@ -6648,6 +6663,30 @@ function renderUploadHistoryStrip() {
       toggleUploadImageForCurrentMode(upload).catch((error) => showErrorPanel("Image failed", error.message));
     });
   });
+  const maybeLoadMore = (scrollToMore = false) => {
+    if (state.uploadHistoryVisibleCount >= uploads.length) return false;
+    const strip = els.uploadHistoryStrip;
+    const nextScrollTop = scrollToMore
+      ? Math.min(strip.scrollTop + strip.clientHeight, Math.max(0, strip.scrollHeight - strip.clientHeight))
+      : strip.scrollTop;
+    state.uploadHistoryVisibleCount = Math.min(uploads.length, state.uploadHistoryVisibleCount + UPLOAD_HISTORY_PAGE_SIZE);
+    renderUploadHistoryStrip({ restoreScrollTop: nextScrollTop });
+    return true;
+  };
+  els.uploadHistoryStrip.onscroll = () => {
+    const strip = els.uploadHistoryStrip;
+    if (strip.scrollTop + strip.clientHeight >= strip.scrollHeight - 24) maybeLoadMore(false);
+  };
+  els.uploadHistoryStrip.onwheel = (event) => {
+    if (event.deltaY <= 0) return;
+    const strip = els.uploadHistoryStrip;
+    const canScroll = strip.scrollHeight > strip.clientHeight + 1;
+    const nearBottom = strip.scrollTop + strip.clientHeight >= strip.scrollHeight - 24;
+    if (!canScroll || nearBottom) {
+      const loaded = maybeLoadMore(!canScroll);
+      if (loaded && !canScroll) event.preventDefault();
+    }
+  };
 }
 
 function composerAttachedSources() {
